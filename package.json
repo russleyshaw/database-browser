@@ -8,7 +8,8 @@
         "build": "tsc && vite build",
         "preview": "vite preview",
         "check": "bunx tsc --noEmit",
-        "tauri": "tauri"
+        "tauri": "tauri",
+        "tauri:build": "bunx tauri build"
     },
     "dependencies": {
         "@blueprintjs/core": "^5.13.0",
@@ -46,10 +47,14 @@
         "@types/react-dom": "^18.2.7",
         "@vitejs/plugin-react": "^4.2.1",
         "autoprefixer": "^10.4.20",
+        "browserslist": "^4.24.0",
         "postcss": "^8.4.47",
         "tailwindcss": "^3.4.12",
         "typescript": "^5.2.2",
         "vite": "^5.3.1",
         "vite-tsconfig-paths": "^5.0.1"
+    },
+    "browserslist": {
+        "target": ["es2021", "chrome97", "safari13"]
     }
 }

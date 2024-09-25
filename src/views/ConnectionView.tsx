@@ -120,7 +120,7 @@ export const ConnectionBrowser = observer(({ connection }: ConnectionBrowserProp
     const [selectedView, setSelectedView] = useState<View>({
         type: "dashboard",
     });
-    const tablesQuery = useQuery({
+    useQuery({
         queryKey: ["updateMeta", connection.id],
         queryFn: async () => {
             return connection.updateMeta();

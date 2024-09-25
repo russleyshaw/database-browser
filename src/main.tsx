@@ -22,14 +22,13 @@ declare module "@tanstack/react-router" {
     }
 }
 
-const test = await invoke("greet", { name: "World" });
-console.log(test);
+// const test = await invoke("greet", { name: "World" });
+// console.log(test);
 
 import { assertExists } from "@/lib/utils";
 import { BlueprintProvider } from "@blueprintjs/core";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
-import { invoke } from "@tauri-apps/api/tauri";
 import { observer } from "mobx-react";
 import { queryClient } from "./global";
 
