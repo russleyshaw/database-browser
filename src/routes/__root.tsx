@@ -1,3 +1,4 @@
+import { SETTINGS_MODEL } from "@/components/SettingsDialog";
 import { Titlebar } from "@/components/Titlebar";
 import { THEME_STORE, useTheme } from "@/models/theme";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -15,8 +16,12 @@ export const Route = createRootRoute({
 
                 <Outlet />
 
-                <ReactQueryDevtools />
-                <TanStackRouterDevtools />
+                {SETTINGS_MODEL.values.isDebug && (
+                    <>
+                        <ReactQueryDevtools />
+                        <TanStackRouterDevtools />
+                    </>
+                )}
             </div>
         );
     }),

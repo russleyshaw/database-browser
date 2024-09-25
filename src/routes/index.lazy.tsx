@@ -1,18 +1,12 @@
-import { type ButtonTabEntry, ButtonTabs } from "@/components/ButtonTabs";
+import { ButtonTabs } from "@/components/ButtonTabs";
 import { ManageConnectionsDialog } from "@/components/ManageConnectionsDialog";
 import { SettingsDialog } from "@/components/SettingsDialog";
 import { ConnectionModel } from "@/models/connection";
-import { ConnectionBrowser } from "@/views/ConnectionBrowser";
-import { TableNodeView } from "@/views/TableNodeView";
+import { ConnectionBrowser } from "@/views/ConnectionView";
 import { Button } from "@blueprintjs/core";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { observer } from "mobx-react";
 import { useState } from "react";
-
-enum ViewMode {
-    Browser = "browser",
-    Nodes = "nodes",
-}
 
 export const Route = createLazyFileRoute("/")({
     component: observer(() => {
@@ -26,19 +20,6 @@ export const Route = createLazyFileRoute("/")({
             name: connection.name,
             value: connection.id,
         }));
-
-        const viewTabs: ButtonTabEntry<ViewMode>[] = [
-            {
-                name: "Browser",
-                value: ViewMode.Browser,
-            },
-            {
-                name: "Nodes",
-                value: ViewMode.Nodes,
-            },
-        ];
-
-        const [selectedView, setSelectedView] = useState<ViewMode>(ViewMode.Browser);
 
         const activeConnection = activeConnections.find((c) => c.id === activeConnectionId);
 
@@ -63,19 +44,7 @@ export const Route = createLazyFileRoute("/")({
                         <Button icon="cog" onClick={() => setIsSettingsOpen(true)} />
                     </div>
                 </div>
-
-                <ButtonTabs
-                    tabs={viewTabs}
-                    selectedTab={selectedView}
-                    onSelectTab={(newView) => {
-                        setSelectedView(newView);
-                    }}
-                />
-
-                {activeConnection && selectedView === ViewMode.Browser && (
-                    <ConnectionBrowser connection={activeConnection} />
-                )}
-                {activeConnection && selectedView === ViewMode.Nodes && <TableNodeView connection={activeConnection} />}
+                {activeConnection && <ConnectionBrowser connection={activeConnection} />}
                 {isManagingConnections && (
                     <ManageConnectionsDialog
                         onClose={() => setIsManagingConnections(false)}

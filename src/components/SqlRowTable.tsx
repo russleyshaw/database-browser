@@ -1,7 +1,7 @@
 import { maybeGet, toMap, uniq } from "@/lib/utils";
 import type { TableData } from "@/models/connection";
 import type {} from "@/models/connection-config";
-import { Card, H3, HTMLTable, Icon, Tag, Tooltip } from "@blueprintjs/core";
+import { H3, HTMLTable, Icon, Tag, Tooltip } from "@blueprintjs/core";
 import { format } from "date-fns";
 import { observer } from "mobx-react";
 import { format as sqlFormat } from "sql-formatter";
@@ -29,7 +29,7 @@ export const SqlRowTable = observer(({ title, tableData, children }: SqlRowTable
     );
 
     return (
-        <Card>
+        <div className="flex flex-col gap-2 text-xs">
             <div className="flex flex-row items-center gap-2">
                 {title && <H3>{title}</H3>}
 
@@ -40,38 +40,40 @@ export const SqlRowTable = observer(({ title, tableData, children }: SqlRowTable
                 )}
                 {children}
             </div>
-            <HTMLTable interactive compact striped className="overflow-x-auto">
-                <thead>
-                    <tr>
-                        {keys.map((key) => {
-                            const myColInfo = colInfo[key];
-                            const colType = colMap.get(key)?.col_type;
-                            return (
-                                <th className="!align-bottom" key={key}>
-                                    <div>
-                                        <div>{key.split("_").join(" ")}</div>
-                                        {myColInfo?.isForeign && <Tag minimal>FK</Tag>}
-                                    </div>
-                                    {colType && <span className="text-[10px] text-gray-500">{colType}</span>}
-                                </th>
-                            );
-                        })}
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((row, rowIdx) => (
-                        // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-                        <tr key={rowIdx}>
-                            {keys.map((key) => (
-                                <td key={key}>
-                                    <SqlCell value={maybeGet(row, key)} />
-                                </td>
-                            ))}
+            <div className="overflow-x-auto">
+                <HTMLTable interactive compact striped className="overflow-x-auto">
+                    <thead>
+                        <tr className="overflow-x-auto">
+                            {keys.map((key) => {
+                                const myColInfo = colInfo[key];
+                                const colType = colMap.get(key)?.col_type;
+                                return (
+                                    <th className="!align-bottom" key={key}>
+                                        <div>
+                                            <div>{key.split("_").join(" ")}</div>
+                                            {myColInfo?.isForeign && <Tag minimal>FK</Tag>}
+                                        </div>
+                                        {colType && <span className="text-[10px] text-gray-500">{colType}</span>}
+                                    </th>
+                                );
+                            })}
                         </tr>
-                    ))}
-                </tbody>
-            </HTMLTable>
-        </Card>
+                    </thead>
+                    <tbody className="overflow-x-auto">
+                        {data.map((row, rowIdx) => (
+                            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                            <tr key={rowIdx}>
+                                {keys.map((key) => (
+                                    <td key={key}>
+                                        <SqlCell value={maybeGet(row, key)} />
+                                    </td>
+                                ))}
+                            </tr>
+                        ))}
+                    </tbody>
+                </HTMLTable>
+            </div>
+        </div>
     );
 });
 

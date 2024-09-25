@@ -122,25 +122,23 @@ export const TableNodeView = observer((props: TableNodeViewProps) => {
     );
 
     return (
-        <div className="grow">
-            <AutoSizer>
-                {({ width, height }) => (
-                    <div style={{ width, height }}>
-                        <ReactFlow
-                            colorMode="dark"
-                            nodes={nodes}
-                            nodeTypes={nodeTypes}
-                            edges={edges}
-                            fitView
-                            onNodesChange={onNodesChange}
-                            onEdgesChange={onEdgesChange}
-                        >
-                            <Background />
-                            <Controls />
-                        </ReactFlow>
-                    </div>
-                )}
-            </AutoSizer>
-        </div>
+        <AutoSizer>
+            {({ width, height }) => (
+                <div style={{ width, height }}>
+                    <ReactFlow
+                        colorMode="dark"
+                        nodes={nodes}
+                        nodeTypes={nodeTypes}
+                        edges={edges}
+                        fitView
+                        onNodesChange={onNodesChange}
+                        onEdgesChange={onEdgesChange}
+                    >
+                        <Background />
+                        <Controls />
+                    </ReactFlow>
+                </div>
+            )}
+        </AutoSizer>
     );
 });

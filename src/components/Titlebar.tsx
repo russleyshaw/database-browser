@@ -1,18 +1,23 @@
 import { Button, ButtonGroup, Intent } from "@blueprintjs/core";
 import { appWindow } from "@tauri-apps/api/window";
+import { observer } from "mobx-react";
+import { SETTINGS_MODEL } from "./SettingsDialog";
 
 export interface TitlebarProps {
     title?: string;
     children?: React.ReactNode;
 }
 
-export function Titlebar({ title, children }: TitlebarProps) {
+export const Titlebar = observer(({ title, children }: TitlebarProps) => {
     return (
         <div data-tauri-drag-region className="p-1 flex flex-row h-8 z-[1000]">
             <div className="flex flex-row items-center gap-2">
                 <div>{title ?? document.title}</div>
                 {children}
-                <span className="text-xs text-gray-500 font-mono select-none">{window.location.href}</span>
+
+                {SETTINGS_MODEL.values.isDebug && (
+                    <span className="text-xs text-gray-500 font-mono select-none">{window.location.href}</span>
+                )}
             </div>
             <div data-tauri-drag-region className="flex-1">
                 &nbsp;
@@ -30,4 +35,4 @@ export function Titlebar({ title, children }: TitlebarProps) {
             </ButtonGroup>
         </div>
     );
-}
+});
