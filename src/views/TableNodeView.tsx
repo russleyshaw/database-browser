@@ -12,7 +12,6 @@ import {
     applyNodeChanges,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { ColumnNode } from "@/components/xyflow/ColumnNode";
 import { TableNode } from "@/components/xyflow/TableNode";
 import type { ConnectionModel } from "@/models/connection";
 import { useQuery } from "@tanstack/react-query";
@@ -23,13 +22,12 @@ type TableNodeViewProps = {
     connection: ConnectionModel;
 };
 
-const TABLE_DISTANCE = 500;
-const COLUMN_DISTANCE = 50;
+const TABLE_DISTANCE = 300;
 
 export const TableNodeView = observer((props: TableNodeViewProps) => {
     const { connection } = props;
 
-    const nodeTypes = useMemo(() => ({ table: TableNode, column: ColumnNode }), []);
+    const nodeTypes = useMemo(() => ({ Table: TableNode }), []);
 
     const [nodes, setNodes] = useState<Node[]>([]);
     const [edges, setEdges] = useState<Edge[]>([]);
@@ -46,66 +44,36 @@ export const TableNodeView = observer((props: TableNodeViewProps) => {
 
         console.log("Updating nodes and edges");
 
-        const newNodes: Node[] = [];
+        const newNodes: TableNode[] = [];
         const newEdges: Edge[] = [];
 
         for (const [tableIdx, table] of tablesQuery.data.tables.entries()) {
             const tableX = tableIdx * TABLE_DISTANCE;
-            newNodes.push({
-                id: `${table.schema}.${table.name}`,
-                type: "table",
-                data: { label: `${table.schema}.${table.name}` },
+            const tableId = `${table.schema}.${table.name}`;
+            const newNode: TableNode = {
+                id: tableId,
+                type: "Table",
+                data: { table: table.name, schema: table.schema, connection: connection },
                 position: { x: tableX, y: 0 },
-            });
+            };
+            newNodes.push(newNode);
+            console.log(newNode);
+        }
 
-            const columns = tablesQuery.data.columns.filter((column) => column.table === table.name);
+        // Connect FKs
+        for (const foreignKey of tablesQuery.data.foreignKeys) {
+            // Skip self-referential FKs
+            if (foreignKey.table === foreignKey.referencedTable) continue;
+            const newEdge: Edge = {
+                id: `${foreignKey.schema}.${foreignKey.table}.${foreignKey.name}`,
+                source: `${foreignKey.schema}.${foreignKey.table}`,
+                target: `${foreignKey.referencedSchema}.${foreignKey.referencedTable}`,
+                sourceHandle: `${foreignKey.schema}.${foreignKey.table}.${foreignKey.column}`,
+                targetHandle: `${foreignKey.referencedSchema}.${foreignKey.referencedTable}.${foreignKey.referencedColumn}`,
+            };
 
-            for (const [columnIdx, column] of columns.entries()) {
-                const foundPrimaryKey = tablesQuery.data.primaryKeys.find(
-                    (primaryKey) =>
-                        primaryKey.schema === table.schema &&
-                        primaryKey.table === table.name &&
-                        primaryKey.column === column.name,
-                );
-
-                const foundUniqueKey = tablesQuery.data.uniqueKeys.find(
-                    (uniqueKey) =>
-                        uniqueKey.schema === table.schema &&
-                        uniqueKey.table === table.name &&
-                        uniqueKey.columns.includes(column.name),
-                );
-
-                newNodes.push({
-                    id: `${table.schema}.${table.name}.${column.name}`,
-                    type: "column",
-                    data: {
-                        label: `${column.name}`,
-                        isPrimaryKey: !!foundPrimaryKey,
-                        isUniqueKey: !!foundUniqueKey,
-                        type: column.type,
-                    },
-                    position: {
-                        y: columnIdx * COLUMN_DISTANCE - (columns.length * COLUMN_DISTANCE) / 2,
-                        x: tableX + 200,
-                    },
-                } as ColumnNode);
-
-                newEdges.push({
-                    id: `${table.schema}.${table.name}.${column.name}`,
-                    source: `${table.schema}.${table.name}`,
-                    target: `${column.schema}.${column.table}.${column.name}`,
-                });
-            }
-
-            for (const foreignKey of tablesQuery.data.foreignKeys) {
-                if (foreignKey.table !== table.name) continue;
-                newEdges.push({
-                    id: `${table.schema}.${table.name}.${foreignKey.name}`,
-                    source: `${foreignKey.schema}.${foreignKey.table}.${foreignKey.column}`,
-                    target: `${foreignKey.referencedSchema}.${foreignKey.referencedTable}.${foreignKey.referencedColumn}`,
-                    animated: true,
-                });
-            }
+            newEdges.push(newEdge);
+            console.log("Edge", newEdge);
         }
 
         setNodes(newNodes);

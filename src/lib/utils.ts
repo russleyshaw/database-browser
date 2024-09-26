@@ -65,3 +65,15 @@ export function toMap<K, V, T>(
 export function clamp(value: number, min: number, max: number) {
     return Math.min(Math.max(value, min), max);
 }
+
+export interface BaseDiscUnion {
+    type: string;
+}
+
+export function matchUnions<
+    T extends BaseDiscUnion,
+    U extends { [K in T["type"]]: (value: Extract<T, { type: K }>) => unknown },
+>(value: T, cases: U): ReturnType<T["type"] extends keyof U ? U[T["type"]] : never> {
+    assertKeyOfObject(cases, value.type);
+    return cases[value.type as keyof U](value as any);
+}

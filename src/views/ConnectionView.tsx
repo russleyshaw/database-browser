@@ -1,15 +1,15 @@
+import { type BaseDiscUnion, matchUnions } from "@/lib/utils";
 import type { ConnectionModel } from "@/models/connection";
 import { Tree, type TreeNodeInfo } from "@blueprintjs/core";
 import { useQuery } from "@tanstack/react-query";
 import { observer, useLocalObservable } from "mobx-react";
 import { useState } from "react";
 import { SidebarLayout } from "../components/SidebarLayout";
+import { NewSavedQueryView } from "./NewSavedQueryView";
 import { TableBrowserView } from "./TableBrowserView";
 import { TableNodeView } from "./TableNodeView";
 
-interface BaseView {
-    type: string;
-}
+interface BaseView extends BaseDiscUnion {}
 
 interface DashboardView extends BaseView {
     type: "dashboard";
@@ -127,22 +127,23 @@ export const ConnectionBrowser = observer(({ connection }: ConnectionBrowserProp
         },
     });
 
+    const SelectedView = matchUnions(selectedView, {
+        dashboard: () => <div>Dashboard</div>,
+        graph: () => <TableNodeView connection={connection} />,
+        table: (v) => (
+            <TableBrowserView
+                key={`${v.schema}.${v.table}`}
+                connection={connection}
+                schema={v.schema}
+                table={v.table}
+            />
+        ),
+        savedQuery: () => <NewSavedQueryView connection={connection} />,
+    });
+
     return (
         <SidebarLayout sidebar={<Sidebar connection={connection} view={selectedView} setView={setSelectedView} />}>
-            {selectedView.type === "dashboard" && <div>Dashboard</div>}
-
-            {selectedView.type === "graph" && <TableNodeView connection={connection} />}
-
-            {selectedView.type === "table" && (
-                <TableBrowserView
-                    key={`${selectedView.schema}.${selectedView.table}`}
-                    connection={connection}
-                    schema={selectedView.schema}
-                    table={selectedView.table}
-                />
-            )}
-
-            {selectedView.type === "savedQuery" && <div>Saved Query</div>}
+            {SelectedView}
         </SidebarLayout>
     );
 });
