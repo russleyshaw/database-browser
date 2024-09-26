@@ -75,5 +75,5 @@ export function matchUnions<
     U extends { [K in T["type"]]: (value: Extract<T, { type: K }>) => unknown },
 >(value: T, cases: U): ReturnType<T["type"] extends keyof U ? U[T["type"]] : never> {
     assertKeyOfObject(cases, value.type);
-    return cases[value.type as keyof U](value as any);
+    return cases[value.type as keyof U](value as any) as any;
 }

@@ -11,8 +11,6 @@ export interface NewSavedQueryViewProps {
 }
 
 export const NewSavedQueryView = observer((props: NewSavedQueryViewProps) => {
-    const { connection } = props;
-
     const [name, setName] = useState("");
     const [query, setQuery] = useState("SELECT * FROM table WHERE id = $::value");
 

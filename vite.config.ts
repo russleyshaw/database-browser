@@ -6,6 +6,12 @@ import tsconfigPaths from "vite-tsconfig-paths";
 // https://vitejs.dev/config/
 export default defineConfig(async () => ({
     plugins: [TanStackRouterVite(), react(), tsconfigPaths()],
+    esbuild: {
+        target: "ES2022",
+        supported: {
+            "top-level-await": true,
+        },
+    },
 
     // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
     //
