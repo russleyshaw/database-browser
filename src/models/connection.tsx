@@ -1,4 +1,5 @@
 import { promiseAll } from "@/lib/async";
+import type { ConnectionConfigFile, NewQuery, Query } from "@/lib/connection-config-file";
 import { makeAutoObservable, runInAction } from "mobx";
 import {
     type ColumnInfo,
@@ -15,7 +16,6 @@ import {
     getTables,
     getUniqueKeys,
 } from "../lib/pgsql";
-import type { ConnectionConfigModel } from "./connection-config";
 
 export enum DatabaseConnectionStatus {
     IDLE = "IDLE",
@@ -38,7 +38,7 @@ export interface TableData {
 }
 
 export class ConnectionModel {
-    config: ConnectionConfigModel;
+    config: ConnectionConfigFile;
 
     tables: TableInfo[] = [];
     columns: ColumnInfo[] = [];
@@ -48,7 +48,7 @@ export class ConnectionModel {
 
     status = DatabaseConnectionStatus.IDLE;
 
-    constructor(config: ConnectionConfigModel) {
+    constructor(config: ConnectionConfigFile) {
         this.config = config;
 
         makeAutoObservable(this);
@@ -62,6 +62,14 @@ export class ConnectionModel {
         return this.config.name;
     }
 
+    getTag(id: string) {
+        return this.config.tags.find((t) => t.id === id);
+    }
+
+    getQuery(id: string) {
+        return this.config.queries.find((q) => q.id === id);
+    }
+
     async connect() {
         this.status = DatabaseConnectionStatus.CONNECTING;
         try {
@@ -72,6 +80,27 @@ export class ConnectionModel {
             this.status = DatabaseConnectionStatus.FAILED;
             throw e;
         }
+    }
+
+    updateQuery(query: NewQuery | Query) {
+        if ("id" in query && query.id != null) {
+            // Found existing query, update it.
+            this.config.queries = this.config.queries.map((q) => (q.id === query.id ? query : q));
+            return query;
+        }
+
+        // New query, create it.
+        const newQuery: Query = {
+            ...query,
+            id: crypto.randomUUID(),
+        };
+        this.config.queries.push(newQuery);
+
+        return newQuery;
+    }
+
+    removeQuery(id: string) {
+        this.config.queries = this.config.queries.filter((q) => q.id !== id);
     }
 
     async updateMeta() {
@@ -175,30 +204,3 @@ export class ConnectionModel {
         return { data: data.rows, sql, colInfo, query: data };
     }
 }
-export class DatabaseConnectionModelStore {
-    connections: ConnectionModel[] = [];
-
-    constructor() {
-        makeAutoObservable(this);
-    }
-
-    removeConnection(id: string) {
-        this.connections = this.connections.filter((connection) => connection.id !== id);
-    }
-}
-
-export const databaseConnectionModelStore = new DatabaseConnectionModelStore();
-
-databaseConnectionModelStore.connections.push(
-    new ConnectionModel({
-        id: "1",
-        name: "Local",
-        connection: {
-            host: "localhost",
-            port: 5432,
-            database: "postgres",
-            user: "postgres",
-            password: "postgres",
-        },
-    }),
-);

@@ -1,6 +1,5 @@
 import { maybeGet, toMap, uniq } from "@/lib/utils";
 import type { TableData } from "@/models/connection";
-import type {} from "@/models/connection-config";
 import { H3, HTMLTable, Icon, Tag, Tooltip } from "@blueprintjs/core";
 import { format } from "date-fns";
 import { observer } from "mobx-react";

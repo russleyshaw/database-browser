@@ -5,23 +5,20 @@ description = "A Tauri App"
 authors = ["you"]
 edition = "2021"
 
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [build-dependencies]
-tauri-build = { version = "1", features = [] }
+tauri-build = { version = "2.0.0-rc", features = [] }
 
 [dependencies]
-tauri = { version = "1", features = [
-    "window-unminimize",
-    "window-unmaximize",
-    "window-show",
-    "window-minimize",
-    "window-hide",
-    "window-close",
-    "window-start-dragging",
-    "window-maximize",
-    "shell-open",
-] }
+tauri = { version = "2.0.0-rc", features = [] }
+tauri-plugin-fs = "2.0.0-rc"
+tauri-plugin-shell = "2.0.0-rc"
+
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 futures = "0.3"

@@ -1,16 +1,17 @@
+import type { ConnectionConfigFile } from "@/lib/connection-config-file";
 import type { ConnectionArgs } from "@/lib/database";
 import { assertExists } from "@/lib/utils";
+import { APP_MODEL } from "@/models/app";
 import { Button, Dialog, DialogBody, DialogFooter, FormGroup, InputGroup, NumericInput, Tag } from "@blueprintjs/core";
 import { useQuery } from "@tanstack/react-query";
 import { observer } from "mobx-react";
 import { useState } from "react";
 import { useDebouncedValue } from "../hooks/use-debounced-value";
 import { checkConnection } from "../lib/pgsql";
-import { CONNECTION_CONFIG_STORE, type ConnectionConfig } from "../models/connection-config";
 
 interface ConnectionDialogProps {
-    connection?: ConnectionConfig; // If this is provided, the dialog will be in edit mode
-    onSubmit: (connection: ConnectionConfig) => void;
+    connection?: ConnectionConfigFile; // If this is provided, the dialog will be in edit mode
+    onSubmit: (connection: ConnectionConfigFile) => void;
     onClose: () => void;
 }
 
@@ -18,12 +19,12 @@ export const ConnectionDialog = observer(({ connection, onSubmit, onClose }: Con
     const [connectionId] = useState(connection?.id || crypto.randomUUID());
 
     // Form fields
-    const [connectionName, setConnectionName] = useState(connection?.name || "");
-    const [databaseName, setDatabaseName] = useState(connection?.connection.database || "");
-    const [databaseHost, setDatabaseHost] = useState(connection?.connection.host || "");
-    const [databasePort, setDatabasePort] = useState(connection?.connection.port || "");
-    const [databaseUsername, setDatabaseUsername] = useState(connection?.connection.user || "");
-    const [databasePassword, setDatabasePassword] = useState(connection?.connection.password || "");
+    const [connectionName, setConnectionName] = useState(connection?.name || "Local");
+    const [databaseName, setDatabaseName] = useState(connection?.connection.database || "postgres");
+    const [databaseHost, setDatabaseHost] = useState(connection?.connection.host || "localhost");
+    const [databasePort, setDatabasePort] = useState(connection?.connection.port || 5432);
+    const [databaseUsername, setDatabaseUsername] = useState(connection?.connection.user || "postgres");
+    const [databasePassword, setDatabasePassword] = useState(connection?.connection.password || "postgres");
 
     // Resolve from default values.
     const resolvedHost = databaseHost || "localhost";
@@ -43,7 +44,7 @@ export const ConnectionDialog = observer(({ connection, onSubmit, onClose }: Con
 
     let nameError = connectionName.length === 0 && "Connection name is required";
     nameError ||=
-        CONNECTION_CONFIG_STORE.configs.some((c) => c.name === connectionName && c.id !== connectionId) &&
+        APP_MODEL.connections.some((c) => c.name === connectionName && c.id !== connectionId) &&
         "Connection name must be unique";
 
     const error = nameError;
@@ -73,6 +74,10 @@ export const ConnectionDialog = observer(({ connection, onSubmit, onClose }: Con
                 password: resolvedPassword,
                 database: resolvedDatabase,
             },
+            queries: [],
+            tags: [],
+
+            order: 0,
         });
     }
 
@@ -102,7 +107,7 @@ export const ConnectionDialog = observer(({ connection, onSubmit, onClose }: Con
                 </FormGroup>
 
                 <FormGroup label="Database port">
-                    <NumericInput value={databasePort} onChange={(e) => setDatabasePort(e.target.value)} />
+                    <NumericInput value={databasePort} onChange={(e) => setDatabasePort(Number(e.target.value))} />
                 </FormGroup>
 
                 <FormGroup label="Username">

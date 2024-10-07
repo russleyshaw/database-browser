@@ -26,11 +26,11 @@ declare module "@tanstack/react-router" {
 // console.log(test);
 
 import { assertExists } from "@/lib/utils";
-import { BlueprintProvider, Intent } from "@blueprintjs/core";
+import { BlueprintProvider } from "@blueprintjs/core";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { observer } from "mobx-react";
-import { TOASTER, queryClient } from "./global";
+import { queryClient } from "./global";
 
 const rootEl = document.getElementById("root");
 assertExists(rootEl);
@@ -49,6 +49,6 @@ const Root = observer(() => {
 const root = createRoot(rootEl);
 root.render(<Root />);
 
-window.addEventListener("error", (event) => {
-    TOASTER.show({ intent: Intent.DANGER, message: event.error.message });
-});
+// window.addEventListener("error", (event) => {
+//     TOASTER.show({ intent: Intent.DANGER, message: event.error.message });
+// });

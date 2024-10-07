@@ -13,10 +13,29 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as ConnectionConnectionIdImport } from './routes/connection/$connectionId'
 
 // Create Virtual Routes
 
 const IndexLazyImport = createFileRoute('/')()
+const ConnectionConnectionIdIndexLazyImport = createFileRoute(
+  '/connection/$connectionId/',
+)()
+const ConnectionConnectionIdVisualizerLazyImport = createFileRoute(
+  '/connection/$connectionId/visualizer',
+)()
+const ConnectionConnectionIdTableIndexLazyImport = createFileRoute(
+  '/connection/$connectionId/table/',
+)()
+const ConnectionConnectionIdQueryIndexLazyImport = createFileRoute(
+  '/connection/$connectionId/query/',
+)()
+const ConnectionConnectionIdTableTableNameIndexLazyImport = createFileRoute(
+  '/connection/$connectionId/table/$tableName/',
+)()
+const ConnectionConnectionIdQueryQueryIdIndexLazyImport = createFileRoute(
+  '/connection/$connectionId/query/$queryId/',
+)()
 
 // Create/Update Routes
 
@@ -24,6 +43,69 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const ConnectionConnectionIdRoute = ConnectionConnectionIdImport.update({
+  path: '/connection/$connectionId',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const ConnectionConnectionIdIndexLazyRoute =
+  ConnectionConnectionIdIndexLazyImport.update({
+    path: '/',
+    getParentRoute: () => ConnectionConnectionIdRoute,
+  } as any).lazy(() =>
+    import('./routes/connection/$connectionId/index.lazy').then((d) => d.Route),
+  )
+
+const ConnectionConnectionIdVisualizerLazyRoute =
+  ConnectionConnectionIdVisualizerLazyImport.update({
+    path: '/visualizer',
+    getParentRoute: () => ConnectionConnectionIdRoute,
+  } as any).lazy(() =>
+    import('./routes/connection/$connectionId/visualizer.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+
+const ConnectionConnectionIdTableIndexLazyRoute =
+  ConnectionConnectionIdTableIndexLazyImport.update({
+    path: '/table/',
+    getParentRoute: () => ConnectionConnectionIdRoute,
+  } as any).lazy(() =>
+    import('./routes/connection/$connectionId/table/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+
+const ConnectionConnectionIdQueryIndexLazyRoute =
+  ConnectionConnectionIdQueryIndexLazyImport.update({
+    path: '/query/',
+    getParentRoute: () => ConnectionConnectionIdRoute,
+  } as any).lazy(() =>
+    import('./routes/connection/$connectionId/query/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
+
+const ConnectionConnectionIdTableTableNameIndexLazyRoute =
+  ConnectionConnectionIdTableTableNameIndexLazyImport.update({
+    path: '/table/$tableName/',
+    getParentRoute: () => ConnectionConnectionIdRoute,
+  } as any).lazy(() =>
+    import(
+      './routes/connection/$connectionId/table/$tableName/index.lazy'
+    ).then((d) => d.Route),
+  )
+
+const ConnectionConnectionIdQueryQueryIdIndexLazyRoute =
+  ConnectionConnectionIdQueryQueryIdIndexLazyImport.update({
+    path: '/query/$queryId/',
+    getParentRoute: () => ConnectionConnectionIdRoute,
+  } as any).lazy(() =>
+    import('./routes/connection/$connectionId/query/$queryId/index.lazy').then(
+      (d) => d.Route,
+    ),
+  )
 
 // Populate the FileRoutesByPath interface
 
@@ -36,39 +118,163 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/connection/$connectionId': {
+      id: '/connection/$connectionId'
+      path: '/connection/$connectionId'
+      fullPath: '/connection/$connectionId'
+      preLoaderRoute: typeof ConnectionConnectionIdImport
+      parentRoute: typeof rootRoute
+    }
+    '/connection/$connectionId/visualizer': {
+      id: '/connection/$connectionId/visualizer'
+      path: '/visualizer'
+      fullPath: '/connection/$connectionId/visualizer'
+      preLoaderRoute: typeof ConnectionConnectionIdVisualizerLazyImport
+      parentRoute: typeof ConnectionConnectionIdImport
+    }
+    '/connection/$connectionId/': {
+      id: '/connection/$connectionId/'
+      path: '/'
+      fullPath: '/connection/$connectionId/'
+      preLoaderRoute: typeof ConnectionConnectionIdIndexLazyImport
+      parentRoute: typeof ConnectionConnectionIdImport
+    }
+    '/connection/$connectionId/query/': {
+      id: '/connection/$connectionId/query/'
+      path: '/query'
+      fullPath: '/connection/$connectionId/query'
+      preLoaderRoute: typeof ConnectionConnectionIdQueryIndexLazyImport
+      parentRoute: typeof ConnectionConnectionIdImport
+    }
+    '/connection/$connectionId/table/': {
+      id: '/connection/$connectionId/table/'
+      path: '/table'
+      fullPath: '/connection/$connectionId/table'
+      preLoaderRoute: typeof ConnectionConnectionIdTableIndexLazyImport
+      parentRoute: typeof ConnectionConnectionIdImport
+    }
+    '/connection/$connectionId/query/$queryId/': {
+      id: '/connection/$connectionId/query/$queryId/'
+      path: '/query/$queryId'
+      fullPath: '/connection/$connectionId/query/$queryId'
+      preLoaderRoute: typeof ConnectionConnectionIdQueryQueryIdIndexLazyImport
+      parentRoute: typeof ConnectionConnectionIdImport
+    }
+    '/connection/$connectionId/table/$tableName/': {
+      id: '/connection/$connectionId/table/$tableName/'
+      path: '/table/$tableName'
+      fullPath: '/connection/$connectionId/table/$tableName'
+      preLoaderRoute: typeof ConnectionConnectionIdTableTableNameIndexLazyImport
+      parentRoute: typeof ConnectionConnectionIdImport
+    }
   }
 }
 
 // Create and export the route tree
 
+interface ConnectionConnectionIdRouteChildren {
+  ConnectionConnectionIdVisualizerLazyRoute: typeof ConnectionConnectionIdVisualizerLazyRoute
+  ConnectionConnectionIdIndexLazyRoute: typeof ConnectionConnectionIdIndexLazyRoute
+  ConnectionConnectionIdQueryIndexLazyRoute: typeof ConnectionConnectionIdQueryIndexLazyRoute
+  ConnectionConnectionIdTableIndexLazyRoute: typeof ConnectionConnectionIdTableIndexLazyRoute
+  ConnectionConnectionIdQueryQueryIdIndexLazyRoute: typeof ConnectionConnectionIdQueryQueryIdIndexLazyRoute
+  ConnectionConnectionIdTableTableNameIndexLazyRoute: typeof ConnectionConnectionIdTableTableNameIndexLazyRoute
+}
+
+const ConnectionConnectionIdRouteChildren: ConnectionConnectionIdRouteChildren =
+  {
+    ConnectionConnectionIdVisualizerLazyRoute:
+      ConnectionConnectionIdVisualizerLazyRoute,
+    ConnectionConnectionIdIndexLazyRoute: ConnectionConnectionIdIndexLazyRoute,
+    ConnectionConnectionIdQueryIndexLazyRoute:
+      ConnectionConnectionIdQueryIndexLazyRoute,
+    ConnectionConnectionIdTableIndexLazyRoute:
+      ConnectionConnectionIdTableIndexLazyRoute,
+    ConnectionConnectionIdQueryQueryIdIndexLazyRoute:
+      ConnectionConnectionIdQueryQueryIdIndexLazyRoute,
+    ConnectionConnectionIdTableTableNameIndexLazyRoute:
+      ConnectionConnectionIdTableTableNameIndexLazyRoute,
+  }
+
+const ConnectionConnectionIdRouteWithChildren =
+  ConnectionConnectionIdRoute._addFileChildren(
+    ConnectionConnectionIdRouteChildren,
+  )
+
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/connection/$connectionId': typeof ConnectionConnectionIdRouteWithChildren
+  '/connection/$connectionId/visualizer': typeof ConnectionConnectionIdVisualizerLazyRoute
+  '/connection/$connectionId/': typeof ConnectionConnectionIdIndexLazyRoute
+  '/connection/$connectionId/query': typeof ConnectionConnectionIdQueryIndexLazyRoute
+  '/connection/$connectionId/table': typeof ConnectionConnectionIdTableIndexLazyRoute
+  '/connection/$connectionId/query/$queryId': typeof ConnectionConnectionIdQueryQueryIdIndexLazyRoute
+  '/connection/$connectionId/table/$tableName': typeof ConnectionConnectionIdTableTableNameIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/connection/$connectionId/visualizer': typeof ConnectionConnectionIdVisualizerLazyRoute
+  '/connection/$connectionId': typeof ConnectionConnectionIdIndexLazyRoute
+  '/connection/$connectionId/query': typeof ConnectionConnectionIdQueryIndexLazyRoute
+  '/connection/$connectionId/table': typeof ConnectionConnectionIdTableIndexLazyRoute
+  '/connection/$connectionId/query/$queryId': typeof ConnectionConnectionIdQueryQueryIdIndexLazyRoute
+  '/connection/$connectionId/table/$tableName': typeof ConnectionConnectionIdTableTableNameIndexLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/connection/$connectionId': typeof ConnectionConnectionIdRouteWithChildren
+  '/connection/$connectionId/visualizer': typeof ConnectionConnectionIdVisualizerLazyRoute
+  '/connection/$connectionId/': typeof ConnectionConnectionIdIndexLazyRoute
+  '/connection/$connectionId/query/': typeof ConnectionConnectionIdQueryIndexLazyRoute
+  '/connection/$connectionId/table/': typeof ConnectionConnectionIdTableIndexLazyRoute
+  '/connection/$connectionId/query/$queryId/': typeof ConnectionConnectionIdQueryQueryIdIndexLazyRoute
+  '/connection/$connectionId/table/$tableName/': typeof ConnectionConnectionIdTableTableNameIndexLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/connection/$connectionId'
+    | '/connection/$connectionId/visualizer'
+    | '/connection/$connectionId/'
+    | '/connection/$connectionId/query'
+    | '/connection/$connectionId/table'
+    | '/connection/$connectionId/query/$queryId'
+    | '/connection/$connectionId/table/$tableName'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/connection/$connectionId/visualizer'
+    | '/connection/$connectionId'
+    | '/connection/$connectionId/query'
+    | '/connection/$connectionId/table'
+    | '/connection/$connectionId/query/$queryId'
+    | '/connection/$connectionId/table/$tableName'
+  id:
+    | '__root__'
+    | '/'
+    | '/connection/$connectionId'
+    | '/connection/$connectionId/visualizer'
+    | '/connection/$connectionId/'
+    | '/connection/$connectionId/query/'
+    | '/connection/$connectionId/table/'
+    | '/connection/$connectionId/query/$queryId/'
+    | '/connection/$connectionId/table/$tableName/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  ConnectionConnectionIdRoute: typeof ConnectionConnectionIdRouteWithChildren
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  ConnectionConnectionIdRoute: ConnectionConnectionIdRouteWithChildren,
 }
 
 export const routeTree = rootRoute
@@ -83,11 +289,47 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/connection/$connectionId"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
+    },
+    "/connection/$connectionId": {
+      "filePath": "connection/$connectionId.tsx",
+      "children": [
+        "/connection/$connectionId/visualizer",
+        "/connection/$connectionId/",
+        "/connection/$connectionId/query/",
+        "/connection/$connectionId/table/",
+        "/connection/$connectionId/query/$queryId/",
+        "/connection/$connectionId/table/$tableName/"
+      ]
+    },
+    "/connection/$connectionId/visualizer": {
+      "filePath": "connection/$connectionId/visualizer.lazy.tsx",
+      "parent": "/connection/$connectionId"
+    },
+    "/connection/$connectionId/": {
+      "filePath": "connection/$connectionId/index.lazy.tsx",
+      "parent": "/connection/$connectionId"
+    },
+    "/connection/$connectionId/query/": {
+      "filePath": "connection/$connectionId/query/index.lazy.tsx",
+      "parent": "/connection/$connectionId"
+    },
+    "/connection/$connectionId/table/": {
+      "filePath": "connection/$connectionId/table/index.lazy.tsx",
+      "parent": "/connection/$connectionId"
+    },
+    "/connection/$connectionId/query/$queryId/": {
+      "filePath": "connection/$connectionId/query/$queryId/index.lazy.tsx",
+      "parent": "/connection/$connectionId"
+    },
+    "/connection/$connectionId/table/$tableName/": {
+      "filePath": "connection/$connectionId/table/$tableName/index.lazy.tsx",
+      "parent": "/connection/$connectionId"
     }
   }
 }

@@ -1,24 +1,25 @@
 import { Button, ButtonGroup, Dialog, DialogBody, HTMLTable, Icon, Tooltip } from "@blueprintjs/core";
 
 import { checkConnection } from "@/lib/pgsql";
+import { APP_MODEL } from "@/models/app";
+import { ConnectionModel } from "@/models/connection";
 import { useQuery } from "@tanstack/react-query";
 import { observer } from "mobx-react";
 import { useState } from "react";
-import { CONNECTION_CONFIG_STORE, ConnectionConfigModel } from "../models/connection-config";
 import ConfirmIconButton from "./ConfirmIconButton";
 import { ConnectionDialog } from "./ConnectionDialog";
 import TrButton from "./TrButton";
 
 interface ConnectionRowProps {
-    connection: ConnectionConfigModel;
+    connection: ConnectionModel;
     removeConnection: () => void;
     editConnection: () => void;
-    onSelectConnection: (connection: ConnectionConfigModel) => void;
+    onSelectConnection: (connection: ConnectionModel) => void;
 }
 
 const ConnectionRow = observer(
     ({ connection, removeConnection, editConnection, onSelectConnection }: ConnectionRowProps) => {
-        const url = `${connection.connection.host}:${connection.connection.port}`;
+        const url = `${connection.config.connection.host}:${connection.config.connection.port}`;
 
         const connectionStatusQuery = useQuery({
             queryKey: ["connectionStatus", connection.id],
@@ -26,7 +27,7 @@ const ConnectionRow = observer(
             retryDelay: 1000,
             refetchInterval: 10000,
             queryFn: async () => {
-                await checkConnection({ connection: connection.connection });
+                await checkConnection({ connection: connection.config.connection });
                 return "ok";
             },
         });
@@ -34,7 +35,7 @@ const ConnectionRow = observer(
             <TrButton className="align-middle" onClick={() => onSelectConnection(connection)}>
                 <td>{connection.name}</td>
                 <td> {url}</td>
-                <td>{connection.connection.user}</td>
+                <td>{connection.config.connection.user}</td>
                 <td>
                     {connectionStatusQuery.isLoading && <Icon icon="circle" intent="warning" />}
                     {connectionStatusQuery.isSuccess && <Icon icon="tick-circle" intent="success" />}
@@ -65,13 +66,13 @@ const ConnectionRow = observer(
 
 interface ManageConnectionsDialogProps {
     onClose: () => void;
-    onSelectConnection: (connection: ConnectionConfigModel) => void;
+    onSelectConnection: (connection: ConnectionModel) => void;
 }
 
 export const ManageConnectionsDialog = observer(({ onClose, onSelectConnection }: ManageConnectionsDialogProps) => {
     const [addConnectionDialogOpen, setAddConnectionDialogOpen] = useState(false);
 
-    const [editingConnection, setEditingConnection] = useState<ConnectionConfigModel | null>(null);
+    const [editingConnection, setEditingConnection] = useState<ConnectionModel | null>(null);
 
     return (
         <Dialog isOpen onClose={onClose} title="Manage Connections">
@@ -90,12 +91,12 @@ export const ManageConnectionsDialog = observer(({ onClose, onSelectConnection }
                         </tr>
                     </thead>
                     <tbody>
-                        {CONNECTION_CONFIG_STORE.configs.map((connection) => (
+                        {APP_MODEL.connections.map((connection) => (
                             <ConnectionRow
                                 key={connection.name}
                                 connection={connection}
                                 removeConnection={() => {
-                                    CONNECTION_CONFIG_STORE.remove(connection.id);
+                                    APP_MODEL.removeConnection(connection.id);
                                 }}
                                 editConnection={() => {
                                     setEditingConnection(connection);
@@ -108,7 +109,7 @@ export const ManageConnectionsDialog = observer(({ onClose, onSelectConnection }
 
                 {editingConnection && (
                     <ConnectionDialog
-                        connection={editingConnection}
+                        connection={editingConnection.config}
                         onSubmit={() => {
                             setEditingConnection(null);
                         }}
@@ -119,9 +120,7 @@ export const ManageConnectionsDialog = observer(({ onClose, onSelectConnection }
                 {addConnectionDialogOpen && (
                     <ConnectionDialog
                         onSubmit={(connection) => {
-                            CONNECTION_CONFIG_STORE.add(
-                                new ConnectionConfigModel(connection.id, connection.name, connection.connection),
-                            );
+                            APP_MODEL.addConnection(new ConnectionModel(connection));
                             setAddConnectionDialogOpen(false);
                         }}
                         onClose={() => setAddConnectionDialogOpen(false)}

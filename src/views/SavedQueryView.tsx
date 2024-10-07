@@ -2,22 +2,75 @@ import type { ConnectionModel } from "@/models/connection";
 import { Button, EditableText, H1, HTMLTable, Intent } from "@blueprintjs/core";
 import { Editor } from "@monaco-editor/react";
 import { observer, useLocalObservable } from "mobx-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { formatDialect, postgresql } from "sql-formatter";
 
+import type { NewQuery, Query } from "@/lib/connection-config-file";
+import { useNavigate } from "@tanstack/react-router";
 import { FaBroom } from "react-icons/fa";
-export interface NewSavedQueryViewProps {
+
+export interface SavedQueryViewProps {
     connection: ConnectionModel;
+
+    queryId?: string;
+
+    onSave: (query: Query | NewQuery) => Query;
 }
 
-export const NewSavedQueryView = observer((props: NewSavedQueryViewProps) => {
-    const [name, setName] = useState("");
-    const [query, setQuery] = useState("SELECT * FROM table WHERE id = $::value");
+export const SavedQueryEditorView = observer((props: SavedQueryViewProps) => {
+    const { connection, queryId, onSave } = props;
+
+    const savedQuery = useMemo(() => {
+        return (connection.config.queries ?? []).find((q) => q.id === queryId);
+    }, [connection, queryId]);
+
+    const [name, setName] = useState(savedQuery?.name ?? "");
+    const [query, setQuery] = useState(savedQuery?.query ?? "SELECT * FROM table WHERE id = $::value");
 
     const [newParamKey, setNewParamKey] = useState("");
     const [newParamValue, setNewParamValue] = useState("");
 
-    const params = useLocalObservable(() => new Map<string, string>());
+    const navigate = useNavigate();
+
+    const params = useLocalObservable(() => {
+        const params = new Map<string, string>();
+
+        for (const param of savedQuery?.params ?? []) {
+            params.set(param.name, param.value);
+        }
+
+        return params;
+    });
+
+    function reset() {
+        setName(savedQuery?.name ?? "");
+        setQuery(savedQuery?.query ?? "");
+        setNewParamKey("");
+        setNewParamValue("");
+        for (const param of savedQuery?.params ?? []) {
+            params.set(param.name, param.value);
+        }
+    }
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+    useEffect(() => {
+        reset();
+    }, [savedQuery]);
+
+    const currQuery: NewQuery | Query = {
+        id: savedQuery?.id,
+        name,
+        description: "",
+        order: 0,
+        query,
+        params: Array.from(params.entries()).map(([name, value]) => ({
+            name,
+            order: 0,
+            value,
+            type: "string",
+        })),
+        tagIds: [],
+    };
 
     return (
         <div className="flex flex-col gap-2 p-2">
@@ -91,8 +144,22 @@ export const NewSavedQueryView = observer((props: NewSavedQueryViewProps) => {
             />
 
             <div className="flex flex-row gap-2">
-                <Button intent={Intent.DANGER} icon="reset" text="Reset" onClick={() => setName("")} />
-                <Button intent={Intent.PRIMARY} icon="floppy-disk" text="Save" onClick={() => {}} />
+                <Button
+                    intent={Intent.PRIMARY}
+                    icon="floppy-disk"
+                    text={savedQuery ? "Update" : "Create"}
+                    onClick={() => {
+                        const newQuery = onSave(currQuery);
+
+                        // if not defined, we are creating a new query, navigate to it.
+                        if (queryId == null) {
+                            navigate({
+                                to: "/connection/$connectionId/query/$queryId",
+                                params: { connectionId: connection.id, queryId: newQuery.id },
+                            });
+                        }
+                    }}
+                />
             </div>
         </div>
     );
