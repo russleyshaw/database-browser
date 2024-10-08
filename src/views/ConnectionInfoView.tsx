@@ -8,7 +8,7 @@ interface ConnectionInfoViewProps {
 
 export const ConnectionInfoView = observer(({ connection }: ConnectionInfoViewProps) => {
     return (
-        <div className="flex flex-col gap-2 p-2">
+        <div className="flex flex-col gap-2 p-2 h-full">
             <H3>
                 <Label>Name</Label>
                 <EditableText
