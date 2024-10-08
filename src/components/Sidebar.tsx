@@ -119,7 +119,7 @@ export const Sidebar = observer(({ connection }: SidebarProps) => {
                     nodeData: {
                         onClick: () =>
                             navigate({
-                                to: "/connection/$connectionId/table/",
+                                to: "/connection/$connectionId/table",
                                 params: { connectionId: connection.id },
                             }),
                     },
