@@ -19,7 +19,7 @@
   },
   "productName": "database-browser",
   "mainBinaryName": "database-browser",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "identifier": "com.database-browser.app",
   "plugins": {},
   "app": {
