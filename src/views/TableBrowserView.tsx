@@ -2,9 +2,8 @@ import { SqlRowTable } from "@/components/SqlRowTable";
 import TrButton from "@/components/TrButton";
 import { assertExists } from "@/lib/utils";
 import type { ConnectionModel } from "@/models/connection";
-import { Button, Callout, H3, HTMLTable, Icon, Tooltip } from "@blueprintjs/core";
-import { Editor } from "@monaco-editor/react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { Button, H3, HTMLTable, Icon, Tooltip } from "@blueprintjs/core";
+import { useQuery } from "@tanstack/react-query";
 import { observer } from "mobx-react";
 import { useState } from "react";
 
@@ -21,15 +20,6 @@ export const TableBrowserView = observer(({ connection, table, schema }: TableBr
         queryFn: async () => {
             assertExists(connection.tables);
             return connection.getTableData(table, schema, useFks);
-        },
-    });
-
-    const [sql, setSql] = useState("");
-
-    const executeSqlMutation = useMutation({
-        mutationFn: async () => {
-            const data = await connection.executeSql(sql);
-            return { data, sql };
         },
     });
 
@@ -80,11 +70,6 @@ export const TableBrowserView = observer(({ connection, table, schema }: TableBr
                     {useFks ? "Hide FKs" : "Show FKs"}
                 </Button>
             </SqlRowTable>
-
-            {executeSqlMutation.error && <Callout intent="danger">{executeSqlMutation.error.message}</Callout>}
-            <Editor height="40vh" defaultLanguage="sql" value={sql} onChange={(value) => setSql(value ?? "")} />
-            <Button icon="play" onClick={() => executeSqlMutation.mutate()} />
-            <Button icon="cross" onClick={() => setSql("")} />
         </div>
     );
 });

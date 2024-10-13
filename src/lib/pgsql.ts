@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 
 import type { ConnectionArgs } from "@/lib/database";
+import { SQL_LOGGER } from "@/models/SqlLogger";
 import { z } from "zod";
 import { UnknownError } from "./error";
 import { toMap } from "./utils";
@@ -29,6 +30,8 @@ export async function executeSql(args: {
     sql: string;
     params?: unknown[];
 }): Promise<ExecuteQueryResult> {
+    const log = SQL_LOGGER.log(args.sql, args.params ?? []);
+
     const result = (await invoke("pg_execute_query", {
         host: args.connection.host,
         port: args.connection.port,
@@ -38,10 +41,14 @@ export async function executeSql(args: {
         query: args.sql,
         params: args.params ?? [],
     }).catch((err) => {
+        log.error = err.message;
+        log.status = "error";
         console.error("Execute SQL error", err);
         if (err instanceof Error) throw err;
         throw new UnknownError("Unknown error", err);
     })) as ExecuteQueryResult;
+    log.results = result.rows;
+    log.status = "success";
     console.log("Execute SQL result", args.sql, result);
 
     const colMap = toMap(
