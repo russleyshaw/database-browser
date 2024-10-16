@@ -7,7 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { observer } from "mobx-react";
 import { useState } from "react";
 import { useDebouncedValue } from "../hooks/use-debounced-value";
-import { checkConnection } from "../lib/pgsql";
+import { checkConnection } from "../lib/sql/pgsql";
 
 interface ConnectionDialogProps {
     connection?: ConnectionConfigFile; // If this is provided, the dialog will be in edit mode

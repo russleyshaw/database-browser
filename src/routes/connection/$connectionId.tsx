@@ -1,10 +1,9 @@
 import { Sidebar } from "@/components/Sidebar";
-import { SidebarLayout } from "@/components/SidebarLayout";
 import { APP_MODEL } from "@/models/app";
 import { useQuery } from "@tanstack/react-query";
 import { Outlet, createFileRoute, notFound } from "@tanstack/react-router";
 import { observer } from "mobx-react";
-import { ErrorBoundary } from "react-error-boundary";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
 export const Route = createFileRoute("/connection/$connectionId")({
     loader: (ctx) => {
@@ -17,6 +16,7 @@ export const Route = createFileRoute("/connection/$connectionId")({
             connection: connection,
         };
     },
+    notFoundComponent: () => <div>Connection: Not Found</div>,
     component: observer(Component),
 });
 
@@ -30,10 +30,18 @@ function Component() {
     });
 
     return (
-        <SidebarLayout sidebar={<Sidebar connection={connection} />}>
-            <ErrorBoundary fallbackRender={(props) => <div>Error: {JSON.stringify(props.error)}</div>}>
-                <Outlet />
-            </ErrorBoundary>
-        </SidebarLayout>
+        <PanelGroup direction="horizontal">
+            <Panel defaultSize={25} className="overflow-hidden flex flex-col">
+                <div className="grow overflow-auto">
+                    <Sidebar connection={connection} />
+                </div>
+            </Panel>
+            <PanelResizeHandle className="w-2 h-full bg-black/20 hover:bg-black/40" />
+            <Panel minSize={50} className="overflow-hidden flex flex-col">
+                <div className="grow overflow-auto">
+                    <Outlet />
+                </div>
+            </Panel>
+        </PanelGroup>
     );
 }

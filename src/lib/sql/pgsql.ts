@@ -2,9 +2,10 @@ import { invoke } from "@tauri-apps/api/core";
 
 import type { ConnectionArgs } from "@/lib/database";
 import { SQL_LOGGER } from "@/models/SqlLogger";
+import { runInAction } from "mobx";
 import { z } from "zod";
-import { UnknownError } from "./error";
-import { toMap } from "./utils";
+import { UnknownError } from "../error";
+import { toMap } from "../utils";
 
 const PgTimestampSchema = z.object({
     nanos_since_epoch: z.number(),
@@ -41,14 +42,19 @@ export async function executeSql(args: {
         query: args.sql,
         params: args.params ?? [],
     }).catch((err) => {
-        log.error = err.message;
-        log.status = "error";
+        runInAction(() => {
+            log.error = err.message;
+            log.status = "error";
+        });
         console.error("Execute SQL error", err);
         if (err instanceof Error) throw err;
+        if (typeof err === "string") throw new Error(err);
         throw new UnknownError("Unknown error", err);
     })) as ExecuteQueryResult;
-    log.results = result.rows;
-    log.status = "success";
+    runInAction(() => {
+        log.results = result.rows;
+        log.status = "success";
+    });
     console.log("Execute SQL result", args.sql, result);
 
     const colMap = toMap(

@@ -15,7 +15,7 @@ import {
     getPrimaryKeys,
     getTables,
     getUniqueKeys,
-} from "../lib/pgsql";
+} from "../lib/sql/pgsql";
 
 export enum DatabaseConnectionStatus {
     IDLE = "IDLE",

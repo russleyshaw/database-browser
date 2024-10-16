@@ -1,11 +1,14 @@
 import type { ConnectionModel } from "@/models/connection";
-import { Button, EditableText, H1, HTMLTable, Intent } from "@blueprintjs/core";
+import { Button, Callout, EditableText, H1, HTMLTable, Intent } from "@blueprintjs/core";
 import { Editor } from "@monaco-editor/react";
 import { observer, useLocalObservable } from "mobx-react";
 import { useEffect, useMemo, useState } from "react";
 import { formatDialect, postgresql } from "sql-formatter";
 
+import { SqlRowTable } from "@/components/SqlRowTable";
 import type { NewQuery, Query } from "@/lib/connection-config-file";
+import type { SqlRequestResult } from "@/lib/sql/core";
+import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { FaBroom } from "react-icons/fa";
 
@@ -71,6 +74,28 @@ export const SavedQueryEditorView = observer((props: SavedQueryViewProps) => {
         })),
         tagIds: [],
     };
+
+    const executeSqlQueryMut = useMutation<SqlRequestResult>({
+        mutationFn: async () => {
+            const sql = query;
+            const par = Array.from(params.values());
+            const result = await connection.executeSql(sql, par);
+            return {
+                request: {
+                    sql: query,
+                    values: Array.from(params.values()),
+                },
+                response: {
+                    columns: result.columns.map((c) => ({
+                        name: c.name,
+                        type: c.col_type,
+                        orderIdx: c.order_idx,
+                    })),
+                    rows: result.rows,
+                },
+            } satisfies SqlRequestResult;
+        },
+    });
 
     return (
         <div className="flex flex-col gap-2 p-2">
@@ -144,6 +169,9 @@ export const SavedQueryEditorView = observer((props: SavedQueryViewProps) => {
             />
 
             <div className="flex flex-row gap-2">
+                <Button loading={executeSqlQueryMut.isPending} icon="play" onClick={() => executeSqlQueryMut.mutate()}>
+                    Execute
+                </Button>
                 <Button
                     intent={Intent.PRIMARY}
                     icon="floppy-disk"
@@ -161,6 +189,8 @@ export const SavedQueryEditorView = observer((props: SavedQueryViewProps) => {
                     }}
                 />
             </div>
+            {executeSqlQueryMut.data && <SqlRowTable result={executeSqlQueryMut.data} />}
+            {executeSqlQueryMut.error && <Callout intent={Intent.DANGER}>{executeSqlQueryMut.error.message} </Callout>}
         </div>
     );
 });

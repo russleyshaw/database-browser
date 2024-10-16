@@ -103,7 +103,7 @@ export const SqlLogOutput = observer(() => {
     return (
         <>
             {selectedLog && <LogDetailDialog log={selectedLog} onClose={() => setSelectedLog(null)} />}
-            <div className="h-40 overflow-y-auto flex flex-col-reverse">
+            <div className="flex flex-col-reverse">
                 {SQL_LOGGER.logs.map((log, logIdx) => (
                     <LogItem log={log} key={logIdx} onClick={() => setSelectedLog(log)} />
                 ))}

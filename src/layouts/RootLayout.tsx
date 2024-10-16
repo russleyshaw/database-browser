@@ -47,7 +47,7 @@ export const RootLayout = observer(({ children }: RootLayoutProps) => {
                 </div>
             </div>
 
-            {children}
+            <div className="grow overflow-hidden">{children}</div>
 
             {isManagingConnections && (
                 <ManageConnectionsDialog

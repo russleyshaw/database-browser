@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, Dialog, DialogBody, HTMLTable, Icon, Tooltip } from "@blueprintjs/core";
 
-import { checkConnection } from "@/lib/pgsql";
+import { checkConnection } from "@/lib/sql/pgsql";
 import { APP_MODEL } from "@/models/app";
 import { ConnectionModel } from "@/models/connection";
 import { useQuery } from "@tanstack/react-query";

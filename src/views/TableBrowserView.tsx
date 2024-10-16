@@ -1,11 +1,12 @@
 import { SqlRowTable } from "@/components/SqlRowTable";
 import TrButton from "@/components/TrButton";
+import type { SqlRequestResult } from "@/lib/sql/core";
 import { assertExists } from "@/lib/utils";
 import type { ConnectionModel } from "@/models/connection";
-import { Button, H3, HTMLTable, Icon, Tooltip } from "@blueprintjs/core";
+import { H3, H4, HTMLTable, Icon, Tooltip } from "@blueprintjs/core";
 import { useQuery } from "@tanstack/react-query";
 import { observer } from "mobx-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 interface TableBrowserViewProps {
     connection: ConnectionModel;
@@ -25,9 +26,29 @@ export const TableBrowserView = observer(({ connection, table, schema }: TableBr
 
     const columns = connection.columns.filter((c) => c.table === table && c.schema === schema);
 
+    const result = useMemo(() => {
+        if (!dataQuery.data) return null;
+        return {
+            request: {
+                sql: dataQuery.data.sql,
+                values: dataQuery.data.query.values,
+            },
+            response: {
+                columns: dataQuery.data.query.columns.map((col) => ({
+                    name: col.name,
+                    type: col.col_type,
+                    orderIdx: col.order_idx,
+                })),
+                rows: dataQuery.data.data,
+            },
+        } satisfies SqlRequestResult;
+    }, [dataQuery.data]);
+
     return (
         <div className="flex flex-col gap-2 p-2">
-            <H3>Columns</H3>
+            <H3>Table: {table}</H3>
+
+            <H4 className="text-center">Columns</H4>
             <HTMLTable interactive compact striped>
                 <thead>
                     <tr>
@@ -64,12 +85,9 @@ export const TableBrowserView = observer(({ connection, table, schema }: TableBr
                 </tbody>
             </HTMLTable>
 
-            <H3>SQL</H3>
-            <SqlRowTable title={`${schema}.${table}`} loading={dataQuery.isLoading} tableData={dataQuery.data}>
-                <Button icon="refresh" onClick={() => setUseFks(!useFks)}>
-                    {useFks ? "Hide FKs" : "Show FKs"}
-                </Button>
-            </SqlRowTable>
+            <H4 className="text-center">Data</H4>
+
+            <SqlRowTable loading={dataQuery.isLoading} result={result ?? undefined} />
         </div>
     );
 });

@@ -1,4 +1,5 @@
-import { BaseDirectory, readFile, writeFile } from "@tauri-apps/plugin-fs";
+import { appConfigDir } from "@tauri-apps/api/path";
+import { BaseDirectory, mkdir, readFile, writeFile } from "@tauri-apps/plugin-fs";
 import { z } from "zod";
 
 const ConnectionIdSchema = z.string();
@@ -78,10 +79,12 @@ export const AppConfigSchema = z.object({
 
 export type AppConfig = z.infer<typeof AppConfigSchema>;
 
+const baseDir = BaseDirectory.AppConfig;
+
 export async function readConfigFile() {
     try {
         const configFileData = await readFile("config.json", {
-            baseDir: BaseDirectory.AppConfig,
+            baseDir,
         });
         const decoder = new TextDecoder();
         const configFile = JSON.parse(decoder.decode(configFileData));
@@ -93,12 +96,14 @@ export async function readConfigFile() {
     }
 }
 
+await mkdir(await appConfigDir(), { recursive: true });
+
 export async function writeConfigFile(config: AppConfig) {
     try {
         const encoder = new TextEncoder();
         const data = encoder.encode(JSON.stringify(config, null, 2));
         await writeFile("config.json", data, {
-            baseDir: BaseDirectory.AppConfig,
+            baseDir,
         });
     } catch (error) {
         console.error(error);

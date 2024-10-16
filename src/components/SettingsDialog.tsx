@@ -16,7 +16,6 @@ import clsx from "clsx";
 import { makeAutoObservable } from "mobx";
 import { observer } from "mobx-react";
 import { useState } from "react";
-import { SidebarLayout } from "./SidebarLayout";
 
 const SETTINGS_TABS = {
     general: { name: "General", icon: "cog" },
@@ -76,14 +75,7 @@ export const SettingsDialog = observer(({ onClose }: SettingsDialogProps) => {
 
     return (
         <Dialog className="min-w-96" title="Settings" isOpen onClose={onClose}>
-            <DialogBody className="grid left-pane-grid gap-2">
-                <SidebarLayout sidebar={<Sidebar selectedTabKey={selectedTabKey} onSelectTab={setSelectedTabKey} />}>
-                    <div>
-                        {selectedTabKey === "general" && <GeneralSettings />}
-                        {selectedTabKey === "database" && <DatabaseSettings />}
-                    </div>
-                </SidebarLayout>
-            </DialogBody>
+            <DialogBody className="grid left-pane-grid gap-2">Body</DialogBody>
 
             <DialogFooter />
         </Dialog>
